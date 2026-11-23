@@ -70,8 +70,8 @@ button {
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const SUPABASE_URL = 'https://ktymtpqkykidsivsxipb.supabase.co';
 
+const SUPABASE_URL = 'https://ktymtpqkykidsivsxipb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_LVPYXeyt_jr9EhwyF5c9uw_AqLnLBXu';
 
 const db = window.supabase.createClient(
@@ -79,23 +79,91 @@ const db = window.supabase.createClient(
   SUPABASE_KEY
 );
 
-const status = document.createElement('p');
-status.style.textAlign = 'center';
-status.style.padding = '12px';
-status.textContent = 'Supabase : client initialisé';
-
-document.querySelector('main').appendChild(status);
-
 window.pharmaDB = db;
-  db.from('pharmacies')
-  .select('name')
-  .then(({ data, error }) => {
+
+const main = document.querySelector('main');
+
+const login = document.createElement('section');
+login.className = 'card';
+login.innerHTML = `
+  <h2>Connexion</h2>
+  <form id="loginForm">
+    <p>
+      <input id="email" type="email"
+        placeholder="Adresse e-mail" required
+        style="width:90%;padding:12px">
+    </p>
+    <p>
+      <input id="password" type="password"
+        placeholder="Mot de passe" required
+        style="width:90%;padding:12px">
+    </p>
+    <button type="submit">Se connecter</button>
+  </form>
+  <p id="status">Veuillez vous connecter.</p>
+  <button id="logout" type="button" hidden>
+    Déconnexion
+  </button>
+`;
+
+main.appendChild(login);
+
+const status = document.getElementById('status');
+const logout = document.getElementById('logout');
+
+async function checkDatabase() {
+  const { data, error } = await db
+    .from('pharmacies')
+    .select('name')
+    .limit(1);
+
+  if (error) {
+    status.textContent = 'Erreur : ' + error.message;
+  } else {
+    status.textContent = data.length
+      ? 'Connexion réussie : ' + data[0].name
+      : 'Aucune pharmacie trouvée.';
+  }
+}
+
+document.getElementById('loginForm')
+  .addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    status.textContent = 'Connexion en cours...';
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const { error } = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
     if (error) {
-      status.textContent = 'Erreur Supabase : ' + error.message;
-    } else {
-      status.textContent = 'Connexion réussie à Supabase';
+      status.textContent = 'Erreur : ' + error.message;
+      return;
     }
+
+    logout.hidden = false;
+    await checkDatabase();
   });
+
+logout.addEventListener('click', async () => {
+  await db.auth.signOut();
+  status.textContent = 'Vous êtes déconnecté.';
+  logout.hidden = true;
+});
+
+(async () => {
+  const { data } = await db.auth.getSession();
+
+  if (data.session) {
+    logout.hidden = false;
+    await checkDatabase();
+  }
+})();
+
 </script>
 </body>
 </html>

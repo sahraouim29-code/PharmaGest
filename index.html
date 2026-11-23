@@ -87,6 +87,15 @@ status.textContent = 'Supabase : client initialisé';
 document.querySelector('main').appendChild(status);
 
 window.pharmaDB = db;
+  db.from('pharmacies')
+  .select('name')
+  .then(({ data, error }) => {
+    if (error) {
+      status.textContent = 'Erreur Supabase : ' + error.message;
+    } else {
+      status.textContent = 'Connexion réussie à Supabase';
+    }
+  });
 </script>
 </body>
 </html>

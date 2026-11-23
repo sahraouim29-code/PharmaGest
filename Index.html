@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PharmaGestion</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f6fa;
+  color: #243247;
+}
+header {
+  background: #087f70;
+  color: white;
+  padding: 22px;
+  text-align: center;
+}
+main {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+.card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #00000010;
+}
+h2 { color: #087f70; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+  gap: 12px;
+}
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 14px;
+  background: #087f70;
+  color: white;
+  font-size: 15px;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>PharmaGestion</h1>
+  <p>Gestion intelligente de votre pharmacie</p>
+</header>
+<main>
+  <section class="card">
+    <h2>Tableau de bord</h2>
+    <p>Bienvenue dans votre espace de gestion.</p>
+  </section>
+  <section class="card">
+    <h2>Modules</h2>
+    <div class="grid">
+      <button>Médicaments</button>
+      <button>Stock</button>
+      <button>Achats</button>
+      <button>Ventes</button>
+      <button>Fournisseurs</button>
+      <button>Rapports</button>
+    </div>
+  </section>
+</main>
+</body>
+</html>

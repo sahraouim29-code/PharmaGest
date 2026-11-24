@@ -1,78 +1,295 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>PharmaGest</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #f3f6fa;
   color: #243247;
 }
+
 header {
   background: #087f70;
   color: white;
-  padding: 22px;
+  padding: 24px 15px;
   text-align: center;
 }
+
+header h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+header p {
+  margin-bottom: 0;
+}
+
 main {
   padding: 20px;
-  max-width: 900px;
+  max-width: 1000px;
   margin: auto;
 }
+
 .card {
   background: white;
   padding: 20px;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
   border-radius: 12px;
   box-shadow: 0 2px 8px #00000010;
 }
-h2 { color: #087f70; }
+
+h2 {
+  color: #087f70;
+  margin-top: 0;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
 }
+
+.module {
+  background: #e8f4f1;
+  color: #087f70;
+  padding: 18px;
+  border-radius: 9px;
+  text-align: center;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  border: 1px solid #d5dce5;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
 button {
   border: 0;
   border-radius: 8px;
-  padding: 14px;
+  padding: 13px 18px;
   background: #087f70;
   color: white;
   font-size: 15px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.secondary {
+  background: #64748b;
+}
+
+#logout {
+  margin-bottom: 18px;
+}
+
+#loginSection {
+  max-width: 500px;
+  margin: auto;
+}
+
+#medicineSection {
+  display: none;
+}
+
+#status {
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+
+#medicineStatus {
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+
+.medicine-item {
+  border: 1px solid #e1e7ee;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.medicine-item strong {
+  color: #087f70;
+}
+
+.small {
+  color: #64748b;
+  font-size: 13px;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+[hidden] {
+  display: none !important;
 }
 </style>
 </head>
+
 <body>
+
 <header>
   <h1>PharmaGest</h1>
   <p>Gestion intelligente de votre pharmacie</p>
 </header>
+
 <main>
+
+  <!-- DASHBOARD -->
+
   <section class="card">
     <h2>Tableau de bord</h2>
     <p>Bienvenue dans votre espace de gestion.</p>
+    <p id="pharmacyName" class="small">
+      Veuillez vous connecter.
+    </p>
   </section>
+
+  <!-- MODULES -->
+
   <section class="card">
     <h2>Modules</h2>
+
     <div class="grid">
-      <button>Médicaments</button>
-      <button>Stock</button>
-      <button>Achats</button>
-      <button>Ventes</button>
-      <button>Fournisseurs</button>
-      <button>Rapports</button>
+      <div class="module">Médicaments</div>
+      <div class="module">Stock</div>
+      <div class="module">Achats</div>
+      <div class="module">Ventes</div>
+      <div class="module">Fournisseurs</div>
+      <div class="module">Rapports</div>
     </div>
   </section>
+
+  <!-- LOGIN -->
+
+  <section class="card" id="loginSection">
+
+    <h2>Connexion</h2>
+
+    <form id="loginForm">
+
+      <input
+        id="email"
+        type="email"
+        placeholder="Adresse e-mail"
+        autocomplete="username"
+        required
+      >
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Mot de passe"
+        autocomplete="current-password"
+        required
+      >
+
+      <button id="loginButton" type="submit">
+        Se connecter
+      </button>
+
+    </form>
+
+  </section>
+
+  <p id="status" role="status" aria-live="polite"></p>
+
+  <!-- LOGOUT -->
+
+  <button id="logout" class="secondary" type="button" hidden>
+    Déconnexion
+  </button>
+
+  <!-- MEDICINES -->
+
+  <section class="card" id="medicineSection">
+
+    <h2>Gestion des médicaments</h2>
+
+    <form id="medicineForm">
+
+      <input
+        id="medName"
+        placeholder="Nom du médicament"
+        required
+      >
+
+      <input
+        id="medDCI"
+        placeholder="DCI"
+      >
+
+      <input
+        id="medDosage"
+        placeholder="Dosage"
+      >
+
+      <input
+        id="medForm"
+        placeholder="Forme pharmaceutique"
+      >
+
+      <input
+        id="medLab"
+        placeholder="Laboratoire"
+      >
+
+      <button id="addMedicineButton" type="submit">
+        Ajouter médicament
+      </button>
+
+    </form>
+
+    <p id="medicineStatus" role="status" aria-live="polite"></p>
+
+    <h2>Liste des médicaments</h2>
+
+    <div id="medicineList"></div>
+
+  </section>
+
 </main>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<footer>
+  PharmaGest — Gestion de pharmacie
+</footer>
 
 <script>
 
-const SUPABASE_URL = 'https://ktymtpqkykidsivsxipb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_LVPYXeyt_jr9EhwyF5c9uw_AqLnLBXu';
+// =====================================
+// 1. SUPABASE CONFIGURATION
+// =====================================
+
+const SUPABASE_URL =
+  'https://ktymtpqkykidsivsxipb.supabase.co';
+
+const SUPABASE_KEY =
+  'sb_publishable_LVPYXeyt_jr9EhwyF5c9uw_AqLnLBXu';
 
 const db = window.supabase.createClient(
   SUPABASE_URL,
@@ -81,176 +298,396 @@ const db = window.supabase.createClient(
 
 window.pharmaDB = db;
 
-const main = document.querySelector('main');
-const logout = document.createElement('button');
-logout.textContent = 'Déconnexion';
-logout.hidden = true;
-logout.type = 'button';
-main.appendChild(logout);
-const login = document.createElement('section');
-login.className = 'card';
-login.innerHTML = `
-  <h2>Connexion</h2>
-  <form id="loginForm">
-    <p>
-      <input id="email" type="email"
-        placeholder="Adresse e-mail" required
-        style="width:90%;padding:12px">
-    </p>
-    <p>
-      <input id="password" type="password"
-        placeholder="Mot de passe" required
-        style="width:90%;padding:12px">
-    </p>
-    <button type="submit">Se connecter</button>
-  </form>
-  <p id="status">Veuillez vous connecter.</p>
-  <button id="logout" type="button" hidden>
-    Déconnexion
-  </button>
-`;
 
-main.appendChild(login);
-  const medicines = document.createElement('section');
-medicines.className = 'card';
-medicines.innerHTML = `
-  <h2>Médicaments</h2>
-  <form id="medicineForm">
-    <input id="medName" placeholder="Nom du médicament" required>
-    <input id="medDCI" placeholder="DCI">
-    <input id="medDosage" placeholder="Dosage">
-    <input id="medForm" placeholder="Forme pharmaceutique">
-    <input id="medLab" placeholder="Laboratoire">
-    <button type="submit">Ajouter médicament</button>
-  </form>
-  <p id="medicineStatus"></p>
-  <div id="medicineList"></div>
-`;
-main.appendChild(medicines);
-  medicines.style.display = 'none';
+// =====================================
+// 2. ELEMENTS
+// =====================================
+
+const loginSection =
+  document.getElementById('loginSection');
+
+const loginForm =
+  document.getElementById('loginForm');
+
+const loginButton =
+  document.getElementById('loginButton');
+
+const logout =
+  document.getElementById('logout');
+
+const status =
+  document.getElementById('status');
+
+const pharmacyName =
+  document.getElementById('pharmacyName');
+
+const medicineSection =
+  document.getElementById('medicineSection');
+
+const medicineForm =
+  document.getElementById('medicineForm');
+
+const medicineStatus =
+  document.getElementById('medicineStatus');
+
+const medicineList =
+  document.getElementById('medicineList');
+
+const addMedicineButton =
+  document.getElementById('addMedicineButton');
+
+
+// =====================================
+// 3. CURRENT PHARMACY
+// =====================================
+
+let currentPharmacyId = null;
+
+
+// =====================================
+// 4. LOAD MEDICINES
+// =====================================
 
 async function loadMedicines() {
+
+  if (!currentPharmacyId) {
+    return;
+  }
+
+  medicineStatus.textContent = 'Chargement...';
+
   const { data, error } = await db
     .from('medicaments')
-    .select('id,name,dci,dosage,pharmaceutical_form,laboratory')
+    .select(
+      'id,name,dci,dosage,pharmaceutical_form,laboratory'
+    )
+    .eq('pharmacy_id', currentPharmacyId)
     .order('name');
 
   if (error) {
-    document.getElementById('medicineStatus').textContent =
+    medicineStatus.textContent =
       'Erreur : ' + error.message;
     return;
   }
 
-  document.getElementById('medicineList').innerHTML =
-    data.map(m => `
-      <div class="card">
-        <strong>${m.name}</strong><br>
-        ${m.dci || ''} — ${m.dosage || ''}<br>
-        ${m.pharmaceutical_form || ''} — ${m.laboratory || ''}
-      </div>
-    `).join('');
+  medicineList.replaceChildren();
+
+  if (!data || data.length === 0) {
+    medicineStatus.textContent =
+      'Aucun médicament enregistré.';
+    return;
+  }
+
+  data.forEach(m => {
+
+    const item = document.createElement('div');
+    item.className = 'medicine-item';
+
+    const name = document.createElement('strong');
+    name.textContent = m.name || '';
+
+    const details = document.createElement('p');
+
+    details.textContent = [
+      m.dci,
+      m.dosage,
+      m.pharmaceutical_form,
+      m.laboratory
+    ].filter(Boolean).join(' — ');
+
+    item.appendChild(name);
+    item.appendChild(details);
+
+    medicineList.appendChild(item);
+
+  });
+
+  medicineStatus.textContent =
+    data.length + ' médicament(s) enregistré(s).';
 }
 
-document.getElementById('medicineForm')
-.addEventListener('submit', async (event) => {
-  event.preventDefault();
 
-  const { data: { user } } = await db.auth.getUser();
+// =====================================
+// 5. LOAD PHARMACY MEMBERSHIP
+// =====================================
+
+async function getPharmacy(userId) {
 
   const { data: member, error: memberError } = await db
     .from('pharmacy_members')
     .select('pharmacy_id')
-    .eq('user_id', user.id)
-    .single();
+    .eq('user_id', userId)
+    .limit(1)
+    .maybeSingle();
 
   if (memberError || !member) {
-    document.getElementById('medicineStatus').textContent =
-      'Erreur : pharmacie introuvable';
-    return;
+    throw new Error(
+      'Aucune pharmacie associée à cet utilisateur.'
+    );
   }
 
-  const { error } = await db.from('medicaments').insert({
-    pharmacy_id: member.pharmacy_id,
-    name: document.getElementById('medName').value,
-    dci: document.getElementById('medDCI').value,
-    dosage: document.getElementById('medDosage').value,
-    pharmaceutical_form: document.getElementById('medForm').value,
-    laboratory: document.getElementById('medLab').value
-  });
-
-  if (error) {
-    document.getElementById('medicineStatus').textContent =
-      'Erreur : ' + error.message;
-    return;
-  }
-
-  document.getElementById('medicineStatus').textContent =
-    'Médicament ajouté avec succès';
-
-  event.target.reset();
-  loadMedicines();
-});
-
-const status = document.getElementById('status');
-async function checkDatabase() {
-  const { data, error } = await db
+  const { data: pharmacy, error: pharmacyError } = await db
     .from('pharmacies')
-    .select('name')
-    .limit(1);
+    .select('id,name')
+    .eq('id', member.pharmacy_id)
+    .single();
 
-  if (error) {
-    status.textContent = 'Erreur : ' + error.message;
-  } else {
-    status.textContent = data.length
-      ? 'Connexion réussie : ' + data[0].name
-      : 'Aucune pharmacie trouvée.';
+  if (pharmacyError || !pharmacy) {
+    throw new Error(
+      'Impossible de charger la pharmacie.'
+    );
+  }
+
+  return pharmacy;
+}
+
+
+// =====================================
+// 6. SHOW CONNECTED INTERFACE
+// =====================================
+
+async function showAuthenticatedUI(user) {
+
+  try {
+
+    loginSection.style.display = 'none';
+
+    status.textContent = 'Chargement de votre pharmacie...';
+
+    logout.hidden = false;
+
+    const pharmacy = await getPharmacy(user.id);
+
+    currentPharmacyId = pharmacy.id;
+
+    pharmacyName.textContent =
+      'Pharmacie : ' + pharmacy.name;
+
+    medicineSection.style.display = 'block';
+
+    await loadMedicines();
+
+    status.textContent =
+      'Connexion réussie.';
+
+  } catch (error) {
+
+    currentPharmacyId = null;
+
+    medicineSection.style.display = 'none';
+
+    status.textContent =
+      'Erreur : ' + error.message;
+
   }
 }
 
-document.getElementById('loginForm')
-  .addEventListener('submit', async (event) => {
-    event.preventDefault();
 
-    status.textContent = 'Connexion en cours...';
+// =====================================
+// 7. LOGIN
+// =====================================
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+loginForm.addEventListener('submit', async (event) => {
 
-    const { error } = await db.auth.signInWithPassword({
+  event.preventDefault();
+
+  loginButton.disabled = true;
+
+  status.textContent = 'Connexion en cours...';
+
+  const email =
+    document.getElementById('email').value.trim();
+
+  const password =
+    document.getElementById('password').value;
+
+  try {
+
+    const { data, error } = await db.auth.signInWithPassword({
       email,
       password
     });
 
     if (error) {
-      status.textContent = 'Erreur : ' + error.message;
-      return;
+      throw error;
     }
 
-    login.style.display = 'none';
-logout.hidden = false;
-medicines.style.display = 'block';
-await checkDatabase();
-logout.addEventListener('click', async () => {
-  await db.auth.signOut();
+    await showAuthenticatedUI(data.user);
 
-  login.style.display = 'block';
-  medicines.style.display = 'none';
+  } catch (error) {
+
+    status.textContent =
+      'Erreur : ' + error.message;
+
+  } finally {
+
+    loginButton.disabled = false;
+
+  }
+
+});
+
+
+// =====================================
+// 8. LOGOUT
+// =====================================
+
+logout.addEventListener('click', async () => {
+
+  logout.disabled = true;
+
+  const { error } = await db.auth.signOut();
+
+  logout.disabled = false;
+
+  if (error) {
+    status.textContent =
+      'Erreur : ' + error.message;
+    return;
+  }
+
+  currentPharmacyId = null;
+
+  loginSection.style.display = 'block';
+
+  medicineSection.style.display = 'none';
+
   logout.hidden = true;
 
-  status.textContent = 'Vous êtes déconnecté.';
+  pharmacyName.textContent =
+    'Veuillez vous connecter.';
+
+  medicineList.replaceChildren();
+
+  medicineStatus.textContent = '';
+
+  loginForm.reset();
+
+  status.textContent =
+    'Vous êtes déconnecté.';
+
 });
-(async () => {
-  const { data } = await db.auth.getSession();
+
+
+// =====================================
+// 9. ADD MEDICINE
+// =====================================
+
+medicineForm.addEventListener('submit', async (event) => {
+
+  event.preventDefault();
+
+  if (!currentPharmacyId) {
+    medicineStatus.textContent =
+      'Veuillez vous connecter.';
+    return;
+  }
+
+  addMedicineButton.disabled = true;
+
+  medicineStatus.textContent =
+    'Enregistrement en cours...';
+
+  try {
+
+    const { data: userData, error: userError } =
+      await db.auth.getUser();
+
+    if (userError || !userData.user) {
+      throw new Error('Session expirée. Reconnectez-vous.');
+    }
+
+    const { error } = await db
+      .from('medicaments')
+      .insert({
+
+        pharmacy_id: currentPharmacyId,
+
+        name: document.getElementById('medName').value.trim(),
+
+        dci: document.getElementById('medDCI').value.trim(),
+
+        dosage: document.getElementById('medDosage').value.trim(),
+
+        pharmaceutical_form:
+          document.getElementById('medForm').value.trim(),
+
+        laboratory:
+          document.getElementById('medLab').value.trim()
+
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    medicineForm.reset();
+
+    medicineStatus.textContent =
+      'Médicament ajouté avec succès.';
+
+    await loadMedicines();
+
+  } catch (error) {
+
+    medicineStatus.textContent =
+      'Erreur : ' + error.message;
+
+  } finally {
+
+    addMedicineButton.disabled = false;
+
+  }
+
+});
+
+
+// =====================================
+// 10. RESTORE SESSION
+// =====================================
+
+async function initializeApp() {
+
+  status.textContent = 'Vérification de la session...';
+
+  const { data, error } = await db.auth.getSession();
+
+  if (error) {
+
+    status.textContent =
+      'Erreur : ' + error.message;
+
+    return;
+  }
 
   if (data.session) {
-    medicines.style.display = 'block';
-loadMedicines();
-    logout.hidden = false;
-    medicines.style.display = 'block';
-    await checkDatabase();
+
+    await showAuthenticatedUI(data.session.user);
+
+  } else {
+
+    loginSection.style.display = 'block';
+
+    medicineSection.style.display = 'none';
+
+    logout.hidden = true;
+
+    status.textContent =
+      'Veuillez vous connecter.';
+
   }
-})();
+
+}
+
+
+// =====================================
+// 11. START APPLICATION
+// =====================================
+
+initializeApp();
 
 </script>
+
 </body>
 </html>
+

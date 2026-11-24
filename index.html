@@ -224,8 +224,11 @@ document.getElementById('loginForm')
       return;
     }
 
-    logout.hidden = false;
-    await checkDatabase();
+    login.style.display = 'none';
+logout.hidden = false;
+medicines.style.display = 'block';
+await checkDatabase();
+loadMedicines();
   });
 
 logout.addEventListener('click', async () => {

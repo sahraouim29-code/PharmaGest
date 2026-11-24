@@ -82,7 +82,11 @@ const db = window.supabase.createClient(
 window.pharmaDB = db;
 
 const main = document.querySelector('main');
-
+const logout = document.createElement('button');
+logout.textContent = 'Déconnexion';
+logout.hidden = true;
+logout.type = 'button';
+main.appendChild(logout);
 const login = document.createElement('section');
 login.className = 'card';
 login.innerHTML = `
@@ -107,9 +111,6 @@ login.innerHTML = `
 `;
 
 main.appendChild(login);
-  const logout = document.getElementById('logout');
-login.removeChild(logout);
-main.insertBefore(logout, login.nextSibling);
   const medicines = document.createElement('section');
 medicines.className = 'card';
 medicines.innerHTML = `
@@ -191,8 +192,6 @@ document.getElementById('medicineForm')
 });
 
 const status = document.getElementById('status');
-const logout = document.getElementById('logout');
-
 async function checkDatabase() {
   const { data, error } = await db
     .from('pharmacies')
@@ -231,14 +230,15 @@ document.getElementById('loginForm')
 logout.hidden = false;
 medicines.style.display = 'block';
 await checkDatabase();
-loadMedicines();
-
 logout.addEventListener('click', async () => {
   await db.auth.signOut();
-  status.textContent = 'Vous êtes déconnecté.';
-  logout.hidden = true;
-});
 
+  login.style.display = 'block';
+  medicines.style.display = 'none';
+  logout.hidden = true;
+
+  status.textContent = 'Vous êtes déconnecté.';
+});
 (async () => {
   const { data } = await db.auth.getSession();
 

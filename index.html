@@ -107,6 +107,85 @@ login.innerHTML = `
 `;
 
 main.appendChild(login);
+  const medicines = document.createElement('section');
+medicines.className = 'card';
+medicines.innerHTML = `
+  <h2>Médicaments</h2>
+  <form id="medicineForm">
+    <input id="medName" placeholder="Nom du médicament" required>
+    <input id="medDCI" placeholder="DCI">
+    <input id="medDosage" placeholder="Dosage">
+    <input id="medForm" placeholder="Forme pharmaceutique">
+    <input id="medLab" placeholder="Laboratoire">
+    <button type="submit">Ajouter médicament</button>
+  </form>
+  <p id="medicineStatus"></p>
+  <div id="medicineList"></div>
+`;
+main.appendChild(medicines);
+  medicines.style.display = 'none';
+
+async function loadMedicines() {
+  const { data, error } = await db
+    .from('medicaments')
+    .select('id,name,dci,dosage,pharmaceutical_form,laboratory')
+    .order('name');
+
+  if (error) {
+    document.getElementById('medicineStatus').textContent =
+      'Erreur : ' + error.message;
+    return;
+  }
+
+  document.getElementById('medicineList').innerHTML =
+    data.map(m => `
+      <div class="card">
+        <strong>${m.name}</strong><br>
+        ${m.dci || ''} — ${m.dosage || ''}<br>
+        ${m.pharmaceutical_form || ''} — ${m.laboratory || ''}
+      </div>
+    `).join('');
+}
+
+document.getElementById('medicineForm')
+.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const { data: { user } } = await db.auth.getUser();
+
+  const { data: member, error: memberError } = await db
+    .from('pharmacy_members')
+    .select('pharmacy_id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (memberError || !member) {
+    document.getElementById('medicineStatus').textContent =
+      'Erreur : pharmacie introuvable';
+    return;
+  }
+
+  const { error } = await db.from('medicaments').insert({
+    pharmacy_id: member.pharmacy_id,
+    name: document.getElementById('medName').value,
+    dci: document.getElementById('medDCI').value,
+    dosage: document.getElementById('medDosage').value,
+    pharmaceutical_form: document.getElementById('medForm').value,
+    laboratory: document.getElementById('medLab').value
+  });
+
+  if (error) {
+    document.getElementById('medicineStatus').textContent =
+      'Erreur : ' + error.message;
+    return;
+  }
+
+  document.getElementById('medicineStatus').textContent =
+    'Médicament ajouté avec succès';
+
+  event.target.reset();
+  loadMedicines();
+});
 
 const status = document.getElementById('status');
 const logout = document.getElementById('logout');
@@ -159,7 +238,10 @@ logout.addEventListener('click', async () => {
   const { data } = await db.auth.getSession();
 
   if (data.session) {
+    medicines.style.display = 'block';
+loadMedicines();
     logout.hidden = false;
+    medicines.style.display = 'block';
     await checkDatabase();
   }
 })();

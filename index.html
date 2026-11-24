@@ -107,6 +107,9 @@ login.innerHTML = `
 `;
 
 main.appendChild(login);
+  const logout = document.getElementById('logout');
+login.removeChild(logout);
+main.insertBefore(logout, login.nextSibling);
   const medicines = document.createElement('section');
 medicines.className = 'card';
 medicines.innerHTML = `

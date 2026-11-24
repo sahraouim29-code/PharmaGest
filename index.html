@@ -229,7 +229,6 @@ logout.hidden = false;
 medicines.style.display = 'block';
 await checkDatabase();
 loadMedicines();
-  });
 
 logout.addEventListener('click', async () => {
   await db.auth.signOut();

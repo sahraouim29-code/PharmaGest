@@ -27,7 +27,33 @@ nav button{background:#dce9e6;color:#145c53}nav button.active{background:var(--g
 .tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:13px}th{background:#f8fafc;color:#475569}
 .small{font-size:12px;color:var(--muted)}.status{padding:10px 0;overflow-wrap:anywhere}.ok{color:var(--green)}.err{color:var(--red)}.warn{color:var(--amber)}
 #loginCard{max-width:480px;margin:25px auto}.hidden{display:none!important}.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef2f6;font-size:12px}.pill.red{background:#fee4e2;color:#b42318}.pill.orange{background:#fff0d6;color:#8a4b00}
-footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
+
+.launcher{padding:16px 14px 12px;overflow:hidden}
+.launcher-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.launcher-head h2{margin:0 0 4px}
+.swipe-hint{font-size:20px;color:#94a3b8;letter-spacing:2px}
+.tile-viewport{overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding:3px 2px 12px;-webkit-overflow-scrolling:touch;touch-action:pan-x}
+.tile-track{display:flex;gap:12px;width:max-content;min-width:100%}
+.module-tile{width:126px;min-width:126px;min-height:142px;padding:10px 8px;background:#fff;color:var(--ink);border:1px solid #e5eaf0;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:9px;white-space:normal;scroll-snap-align:center;box-shadow:0 2px 8px #0000000a;transition:transform .18s,border-color .18s,box-shadow .18s}
+.module-tile:active{transform:scale(.97)}
+.module-tile.active{border:2px solid #087f70;box-shadow:0 5px 16px #087f7020;background:#f7fffd}
+.tile-icon{width:72px;height:72px;border-radius:15px;display:grid;place-items:center;color:white;font-size:35px;font-weight:700;box-shadow:inset 0 -5px 0 #00000012}
+.tile-label{font-size:13px;line-height:1.25;font-weight:700;text-align:center}
+.tile-label small{font-size:10px;font-weight:500;color:#64748b}
+.c-entry{background:linear-gradient(145deg,#0ea5a4,#087f70)}
+.c-journal{background:linear-gradient(145deg,#4776e6,#3154b8)}
+.c-sortie{background:linear-gradient(145deg,#f08a36,#d65b18)}
+.c-outjournal{background:linear-gradient(145deg,#d94b65,#a92345)}
+.c-sales{background:linear-gradient(145deg,#8b5cf6,#6338bd)}
+.c-analysis{background:linear-gradient(145deg,#0f9b8e,#08736a)}
+.c-clients{background:linear-gradient(145deg,#d4a017,#a87500)}
+.c-suppliers{background:linear-gradient(145deg,#64748b,#3e4b60)}
+.tile-dots{display:flex;justify-content:center;gap:6px;padding:2px 0 0}
+.tile-dots i{width:6px;height:6px;border-radius:50%;background:#d2d9e2;display:block}
+.tile-dots i.on{width:18px;border-radius:8px;background:#087f70}
+@media(min-width:900px){.module-tile{width:135px;min-width:135px}.tile-track{gap:14px}}
+@media(max-width:600px){.launcher{padding:14px 10px 10px}.module-tile{width:116px;min-width:116px;min-height:132px}.tile-icon{width:66px;height:66px;font-size:32px}.tile-track{gap:9px}}
+\nfooter{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 @media(max-width:600px){main{padding:10px}header{padding:16px}header h1{font-size:23px}.card{padding:14px}nav button{flex:1 1 28%;padding:10px 7px}}
 </style>
 </head>
@@ -47,10 +73,50 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <div class="stats" style="margin-top:15px">
 <div class="stat">Médicaments<strong id="statMeds">—</strong></div><div class="stat">Lots en stock<strong id="statLots">—</strong></div><div class="stat">Unités disponibles<strong id="statQty">—</strong></div><div class="stat">Lots à surveiller<strong id="statExpiry">—</strong></div>
 </div><p id="dashStatus" class="status small"></p></section>
-<nav id="tabs">
-<button class="active" data-tab="medicines">Médicaments</button><button data-tab="suppliers">Fournisseurs</button><button data-tab="lots">Achats / Lots</button><button data-tab="stock">Mouvements</button><button data-tab="reports">Rapports</button>
-</nav>
-<section id="medicines" class="panel active card">
+<section class="launcher card" aria-label="Modules PharmaGest">
+  <div class="launcher-head"><div><h2>Modules</h2><p class="small">Faites glisser horizontalement pour parcourir les fonctions</p></div><div class="swipe-hint" aria-hidden="true">←　→</div></div>
+  <div class="tile-viewport" id="tileViewport">
+    <div class="tile-track" id="tabs">
+      <button class="module-tile active" data-tab="lots" type="button"><span class="tile-icon c-entry">↓</span><span class="tile-label">Entrée<br><small>Factures médicaments</small></span></button>
+      <button class="module-tile" data-tab="journalEntries" type="button"><span class="tile-icon c-journal">▤</span><span class="tile-label">Journal des<br>entrées</span></button>
+      <button class="module-tile" data-tab="stock" type="button"><span class="tile-icon c-sortie">↑</span><span class="tile-label">Sortie<br><small>Sortie médicaments</small></span></button>
+      <button class="module-tile" data-tab="journalSorties" type="button"><span class="tile-icon c-outjournal">⇥</span><span class="tile-label">Journal des<br>sorties</span></button>
+      <button class="module-tile" data-tab="journalVentes" type="button"><span class="tile-icon c-sales">€</span><span class="tile-label">Journal des<br>ventes</span></button>
+      <button class="module-tile" data-tab="analyseVentes" type="button"><span class="tile-icon c-analysis">▥</span><span class="tile-label">Analyse des<br>ventes</span></button>
+      <button class="module-tile" data-tab="clients" type="button"><span class="tile-icon c-clients">♙</span><span class="tile-label">Liste des<br>clients</span></button>
+      <button class="module-tile" data-tab="suppliers" type="button"><span class="tile-icon c-suppliers">♧</span><span class="tile-label">Liste des<br>fournisseurs</span></button>
+    </div>
+  </div>
+  <div class="tile-dots" id="tileDots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+</section>
+<section id="journalEntries" class="panel card">
+<h2>Journal des entrées</h2>
+<p class="small">Historique des réceptions et achats enregistrés.</p>
+<div class="tablewrap"><table><thead><tr><th>Date</th><th>Médicament</th><th>Lot</th><th>Quantité reçue</th><th>Note</th></tr></thead><tbody id="entryJournalRows"></tbody></table></div>
+</section>
+<section id="journalSorties" class="panel card">
+<h2>Journal des sorties</h2>
+<p class="small">Sorties de stock : ventes, échanges cédés, pertes et péremptions.</p>
+<div class="tablewrap"><table><thead><tr><th>Date</th><th>Médicament</th><th>Lot</th><th>Type</th><th>Quantité</th><th>Note</th></tr></thead><tbody id="exitJournalRows"></tbody></table></div>
+</section>
+<section id="journalVentes" class="panel card">
+<h2>Journal des ventes</h2>
+<p class="small">Mouvements enregistrés avec le type « Vente / sortie ».</p>
+<div class="tablewrap"><table><thead><tr><th>Date</th><th>Médicament</th><th>Lot</th><th>Quantité vendue</th><th>Note</th></tr></thead><tbody id="salesJournalRows"></tbody></table></div>
+</section>
+<section id="analyseVentes" class="panel card">
+<h2>Analyse des ventes</h2>
+<p class="small">Analyse des quantités vendues à partir des mouvements de stock de type vente.</p>
+<div class="stats"><div class="stat">Boîtes vendues<strong id="salesTotal">0</strong></div><div class="stat">Lignes de vente<strong id="salesLines">0</strong></div><div class="stat">Médicaments vendus<strong id="salesProducts">0</strong></div></div>
+<h3>Ventes par médicament (quantités)</h3>
+<div class="tablewrap"><table><thead><tr><th>Médicament</th><th>Quantité vendue</th></tr></thead><tbody id="salesAnalysisRows"></tbody></table></div>
+</section>
+<section id="clients" class="panel card">
+<h2>Liste des clients</h2>
+<p class="small">Ce module nécessite une table « clients » dans la base de données. Elle n'existe pas encore dans la version actuelle de PharmaGest.</p>
+<p class="warn">Aucune donnée client ne sera inventée ni enregistrée avant la création sécurisée de ce module.</p>
+</section>
+<section id="medicines" class="panel card">
 <h2>Gestion des médicaments</h2>
 <form id="medicineForm"><div class="formgrid">
 <label>Nom *<input id="medName" required></label><label>DCI<input id="medDCI"></label><label>Dosage<input id="medDosage"></label><label>Forme pharmaceutique<input id="medForm"></label><label>Laboratoire<input id="medLab"></label>
@@ -64,7 +130,7 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <form id="supplierForm"><div class="formgrid"><label>Nom *<input id="supplierName" required></label><label>Téléphone<input id="supplierPhone"></label><label>Adresse<input id="supplierAddress"></label></div><div class="actions"><button id="addSupplierBtn">Ajouter fournisseur</button></div></form>
 <p id="supplierStatus" class="status small"></p><div class="tablewrap"><table><thead><tr><th>Nom</th><th>Téléphone</th><th>Adresse</th></tr></thead><tbody id="supplierRows"></tbody></table></div>
 </section>
-<section id="lots" class="panel card">
+<section id="lots" class="panel active card">
 <h2>Achats et réception de stock</h2>
 <p class="small">La création d'un lot enregistre automatiquement l'entrée initiale, la quantité et le prix d'achat.</p>
 <form id="lotForm"><div class="formgrid">
@@ -102,8 +168,30 @@ const dateTime=s=>s?new Date(s).toLocaleString('fr-FR'):'—';
 const today=()=>new Date().toISOString().slice(0,10);
 function expiryInfo(date){const days=Math.ceil((new Date(date+'T00:00:00')-new Date(today()+'T00:00:00'))/86400000);if(days<0)return {label:'Expiré',cls:'red',days};if(days<=30)return {label:'≤ 1 mois',cls:'red',days};if(days<=60)return {label:'≤ 2 mois',cls:'orange',days};if(days<=90)return {label:'≤ 3 mois',cls:'orange',days};return {label:'Valide',cls:'',days};}
 function setBusy(id,busy,label){const b=$(id);b.disabled=busy;if(label){if(!b.dataset.original)b.dataset.original=b.textContent;b.textContent=busy?label:b.dataset.original;}}
-function switchTab(id){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));}
+function switchTab(id){
+ document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));
+ const buttons=[...document.querySelectorAll('#tabs button')];
+ buttons.forEach(x=>x.classList.toggle('active',x.dataset.tab===id));
+ const index=buttons.findIndex(x=>x.dataset.tab===id);
+ document.querySelectorAll('#tileDots i').forEach((dot,i)=>dot.classList.toggle('on',i===index));
+ const selected=buttons[index];
+ if(selected && window.matchMedia('(max-width: 700px)').matches){
+   selected.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+ }
+}
 document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+const tileViewport=$('tileViewport');
+let touchStartX=0;
+tileViewport.addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].clientX;},{passive:true});
+tileViewport.addEventListener('touchend',e=>{
+ const dx=e.changedTouches[0].clientX-touchStartX;
+ if(Math.abs(dx)<55)return;
+ const buttons=[...document.querySelectorAll('#tabs button')];
+ const current=buttons.findIndex(b=>b.classList.contains('active'));
+ const next=Math.max(0,Math.min(buttons.length-1,current+(dx<0?1:-1)));
+ if(next!==current)switchTab(buttons[next].dataset.tab);
+},{passive:true});
+
 async function getPharmacy(userId){
  const {data:member,error:me}=await db.from('pharmacy_members').select('pharmacy_id,role').eq('user_id',userId).limit(1).maybeSingle();
  if(me)throw me;if(!member)throw new Error('Aucune pharmacie associée à cet utilisateur.');
@@ -148,6 +236,19 @@ function renderAll(){
  $('movementRows').innerHTML=movements.map(v=>{const l=lotMap.get(v.lot_id);return `<tr><td>${dateTime(v.created_at)}</td><td>${esc(medMap.get(v.medicament_id)?.name||'—')}</td><td>${esc(l?.lot_number||'—')}</td><td>${esc(names[v.movement_type]||v.movement_type)}</td><td>${v.quantity_change>0?'+':''}${v.quantity_change}</td><td>${esc(v.notes||'—')}</td></tr>`}).join('')||'<tr><td colspan="6">Aucun mouvement.</td></tr>';
  $('expiryReport').innerHTML=lots.filter(l=>l.quantity_remaining>0&&expiryInfo(l.expiry_date).days<=90).sort((a,b)=>a.expiry_date.localeCompare(b.expiry_date)).map(l=>{const st=expiryInfo(l.expiry_date);return `<p><span class="pill ${st.cls}">${st.label}</span> <b>${esc(medMap.get(l.medicament_id)?.name||'—')}</b> — Lot ${esc(l.lot_number)} — ${dateFmt(l.expiry_date)} — ${l.quantity_remaining} boîte(s)</p>`}).join('')||'<p class="ok">Aucune alerte de péremption dans les 3 prochains mois.</p>';
  $('priceRows').innerHTML=prices.map(p=>`<tr><td>${dateTime(p.effective_at)}</td><td>${esc(medMap.get(p.medicament_id)?.name||'—')}</td><td>${esc(lotMap.get(p.lot_id)?.lot_number||'—')}</td><td>${Number(p.price).toFixed(2)}</td></tr>`).join('')||'<tr><td colspan="4">Aucun historique de prix.</td></tr>';
+ const entryMoves=movements.filter(v=>v.movement_type==='purchase');
+ $('entryJournalRows').innerHTML=entryMoves.map(v=>`<tr><td>${dateTime(v.created_at)}</td><td>${esc(medMap.get(v.medicament_id)?.name||'—')}</td><td>${esc(lotMap.get(v.lot_id)?.lot_number||'—')}</td><td>${Math.abs(Number(v.quantity_change||0))}</td><td>${esc(v.notes||'—')}</td></tr>`).join('')||'<tr><td colspan="5">Aucune entrée enregistrée.</td></tr>';
+ const exitTypes=['sale','exchange_given','loss','expired'];
+ const exitMoves=movements.filter(v=>exitTypes.includes(v.movement_type));
+ $('exitJournalRows').innerHTML=exitMoves.map(v=>`<tr><td>${dateTime(v.created_at)}</td><td>${esc(medMap.get(v.medicament_id)?.name||'—')}</td><td>${esc(lotMap.get(v.lot_id)?.lot_number||'—')}</td><td>${esc(names[v.movement_type]||v.movement_type)}</td><td>${Math.abs(Number(v.quantity_change||0))}</td><td>${esc(v.notes||'—')}</td></tr>`).join('')||'<tr><td colspan="6">Aucune sortie enregistrée.</td></tr>';
+ const saleMoves=movements.filter(v=>v.movement_type==='sale');
+ $('salesJournalRows').innerHTML=saleMoves.map(v=>`<tr><td>${dateTime(v.created_at)}</td><td>${esc(medMap.get(v.medicament_id)?.name||'—')}</td><td>${esc(lotMap.get(v.lot_id)?.lot_number||'—')}</td><td>${Math.abs(Number(v.quantity_change||0))}</td><td>${esc(v.notes||'—')}</td></tr>`).join('')||'<tr><td colspan="5">Aucune vente enregistrée.</td></tr>';
+ const totals=new Map();
+ saleMoves.forEach(v=>totals.set(v.medicament_id,(totals.get(v.medicament_id)||0)+Math.abs(Number(v.quantity_change||0))));
+ $('salesTotal').textContent=saleMoves.reduce((a,v)=>a+Math.abs(Number(v.quantity_change||0)),0);
+ $('salesLines').textContent=saleMoves.length;
+ $('salesProducts').textContent=totals.size;
+ $('salesAnalysisRows').innerHTML=[...totals.entries()].sort((a,b)=>b[1]-a[1]).map(([id,qty])=>`<tr><td>${esc(medMap.get(id)?.name||'—')}</td><td>${qty}</td></tr>`).join('')||'<tr><td colspan="2">Aucune vente à analyser.</td></tr>';
 }
 async function refresh(){try{await fetchAll();$('dashStatus').textContent='Données actualisées.';}catch(e){$('dashStatus').textContent='Erreur de chargement : '+e.message;}}
 async function showApp(user){

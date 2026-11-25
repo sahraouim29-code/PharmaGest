@@ -1,693 +1,169 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PharmaGest</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f3f6fa;
-  color: #243247;
-}
-
-header {
-  background: #087f70;
-  color: white;
-  padding: 24px 15px;
-  text-align: center;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 30px;
-}
-
-header p {
-  margin-bottom: 0;
-}
-
-main {
-  padding: 20px;
-  max-width: 1000px;
-  margin: auto;
-}
-
-.card {
-  background: white;
-  padding: 20px;
-  margin-bottom: 18px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #00000010;
-}
-
-h2 {
-  color: #087f70;
-  margin-top: 0;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-}
-
-.module {
-  background: #e8f4f1;
-  color: #087f70;
-  padding: 18px;
-  border-radius: 9px;
-  text-align: center;
-  font-weight: bold;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 6px 0;
-  border: 1px solid #d5dce5;
-  border-radius: 7px;
-  font-size: 15px;
-}
-
-button {
-  border: 0;
-  border-radius: 8px;
-  padding: 13px 18px;
-  background: #087f70;
-  color: white;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-.secondary {
-  background: #64748b;
-}
-
-#logout {
-  margin-bottom: 18px;
-}
-
-#loginSection {
-  max-width: 500px;
-  margin: auto;
-}
-
-#medicineSection {
-  display: none;
-}
-
-#status {
-  margin-top: 12px;
-  overflow-wrap: anywhere;
-}
-
-#medicineStatus {
-  margin-top: 12px;
-  overflow-wrap: anywhere;
-}
-
-.medicine-item {
-  border: 1px solid #e1e7ee;
-  padding: 14px;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-.medicine-item strong {
-  color: #087f70;
-}
-
-.small {
-  color: #64748b;
-  font-size: 13px;
-}
-
-footer {
-  text-align: center;
-  padding: 20px;
-  color: #64748b;
-  font-size: 13px;
-}
-
-[hidden] {
-  display: none !important;
-}
+:root{--green:#087f70;--green2:#e8f4f1;--ink:#243247;--muted:#64748b;--line:#e1e7ee;--bg:#f3f6fa;--red:#b42318;--amber:#a15c00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px Arial,sans-serif}
+header{background:var(--green);color:white;padding:19px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-size:26px}header p{margin:5px 0 0;font-size:13px;opacity:.9}
+main{max-width:1180px;margin:auto;padding:16px}
+.card{background:white;padding:18px;border-radius:12px;margin:0 0 16px;box-shadow:0 2px 8px #0000000c}
+h2{color:var(--green);font-size:20px;margin:0 0 14px}h3{font-size:16px;margin:18px 0 10px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d5dce5;border-radius:7px;font:inherit;background:white;min-width:0}
+label{display:block;font-size:13px;color:var(--muted);margin:5px 0}
+button{border:0;border-radius:8px;padding:11px 15px;background:var(--green);color:white;font-weight:600;font-size:14px;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}.secondary{background:#64748b}.danger{background:#b42318}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+nav{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 16px}
+nav button{background:#dce9e6;color:#145c53}nav button.active{background:var(--green);color:white}
+.panel{display:none}.panel.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--green2);padding:15px;border-radius:10px}.stat strong{display:block;font-size:24px;color:var(--green);margin-top:6px}
+.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:13px}th{background:#f8fafc;color:#475569}
+.small{font-size:12px;color:var(--muted)}.status{padding:10px 0;overflow-wrap:anywhere}.ok{color:var(--green)}.err{color:var(--red)}.warn{color:var(--amber)}
+#loginCard{max-width:480px;margin:25px auto}.hidden{display:none!important}.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef2f6;font-size:12px}.pill.red{background:#fee4e2;color:#b42318}.pill.orange{background:#fff0d6;color:#8a4b00}
+footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
+@media(max-width:600px){main{padding:10px}header{padding:16px}header h1{font-size:23px}.card{padding:14px}nav button{flex:1 1 28%;padding:10px 7px}}
 </style>
 </head>
-
 <body>
-
-<header>
-  <h1>PharmaGest</h1>
-  <p>Gestion intelligente de votre pharmacie</p>
-</header>
-
+<header><div><h1>PharmaGest</h1><p>Gestion intelligente de votre pharmacie</p></div><button id="logoutBtn" class="secondary hidden">Déconnexion</button></header>
 <main>
-
-  <!-- DASHBOARD -->
-
-  <section class="card">
-    <h2>Tableau de bord</h2>
-    <p>Bienvenue dans votre espace de gestion.</p>
-    <p id="pharmacyName" class="small">
-      Veuillez vous connecter.
-    </p>
-  </section>
-
-  <!-- MODULES -->
-
-  <section class="card">
-    <h2>Modules</h2>
-
-    <div class="grid">
-      <div class="module">Médicaments</div>
-      <div class="module">Stock</div>
-      <div class="module">Achats</div>
-      <div class="module">Ventes</div>
-      <div class="module">Fournisseurs</div>
-      <div class="module">Rapports</div>
-    </div>
-  </section>
-
-  <!-- LOGIN -->
-
-  <section class="card" id="loginSection">
-
-    <h2>Connexion</h2>
-
-    <form id="loginForm">
-
-      <input
-        id="email"
-        type="email"
-        placeholder="Adresse e-mail"
-        autocomplete="username"
-        required
-      >
-
-      <input
-        id="password"
-        type="password"
-        placeholder="Mot de passe"
-        autocomplete="current-password"
-        required
-      >
-
-      <button id="loginButton" type="submit">
-        Se connecter
-      </button>
-
-    </form>
-
-  </section>
-
-  <p id="status" role="status" aria-live="polite"></p>
-
-  <!-- LOGOUT -->
-
-  <button id="logout" class="secondary" type="button" hidden>
-    Déconnexion
-  </button>
-
-  <!-- MEDICINES -->
-
-  <section class="card" id="medicineSection">
-
-    <h2>Gestion des médicaments</h2>
-
-    <form id="medicineForm">
-
-      <input
-        id="medName"
-        placeholder="Nom du médicament"
-        required
-      >
-
-      <input
-        id="medDCI"
-        placeholder="DCI"
-      >
-
-      <input
-        id="medDosage"
-        placeholder="Dosage"
-      >
-
-      <input
-        id="medForm"
-        placeholder="Forme pharmaceutique"
-      >
-
-      <input
-        id="medLab"
-        placeholder="Laboratoire"
-      >
-
-      <button id="addMedicineButton" type="submit">
-        Ajouter médicament
-      </button>
-
-    </form>
-
-    <p id="medicineStatus" role="status" aria-live="polite"></p>
-
-    <h2>Liste des médicaments</h2>
-
-    <div id="medicineList"></div>
-
-  </section>
-
-</main>
-
-<footer>
-  PharmaGest — Gestion de pharmacie
-</footer>
-
+<section id="loginCard" class="card">
+<h2>Connexion</h2>
+<form id="loginForm">
+<label>Adresse e-mail<input id="email" type="email" autocomplete="username" required></label>
+<label>Mot de passe<input id="password" type="password" autocomplete="current-password" required></label>
+<button id="loginBtn" type="submit">Se connecter</button>
+</form><p id="loginStatus" class="status" role="status"></p>
+</section>
+<div id="app" class="hidden">
+<section class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2 style="margin-bottom:5px">Tableau de bord</h2><div id="pharmacyLabel" class="small"></div></div><div id="roleLabel" class="pill"></div></div>
+<div class="stats" style="margin-top:15px">
+<div class="stat">Médicaments<strong id="statMeds">—</strong></div><div class="stat">Lots en stock<strong id="statLots">—</strong></div><div class="stat">Unités disponibles<strong id="statQty">—</strong></div><div class="stat">Lots à surveiller<strong id="statExpiry">—</strong></div>
+</div><p id="dashStatus" class="status small"></p></section>
+<nav id="tabs">
+<button class="active" data-tab="medicines">Médicaments</button><button data-tab="suppliers">Fournisseurs</button><button data-tab="lots">Achats / Lots</button><button data-tab="stock">Mouvements</button><button data-tab="reports">Rapports</button>
+</nav>
+<section id="medicines" class="panel active card">
+<h2>Gestion des médicaments</h2>
+<form id="medicineForm"><div class="formgrid">
+<label>Nom *<input id="medName" required></label><label>DCI<input id="medDCI"></label><label>Dosage<input id="medDosage"></label><label>Forme pharmaceutique<input id="medForm"></label><label>Laboratoire<input id="medLab"></label>
+</div><div class="actions"><button id="addMedBtn">Ajouter le médicament</button></div></form>
+<p id="medStatus" class="status small"></p>
+<h3>Catalogue</h3><label>Rechercher<input id="medSearch" placeholder="Nom, DCI, dosage, laboratoire..."></label>
+<div class="tablewrap"><table><thead><tr><th>Médicament</th><th>DCI</th><th>Dosage</th><th>Forme</th><th>Laboratoire</th><th>Stock</th></tr></thead><tbody id="medRows"></tbody></table></div>
+</section>
+<section id="suppliers" class="panel card">
+<h2>Fournisseurs</h2>
+<form id="supplierForm"><div class="formgrid"><label>Nom *<input id="supplierName" required></label><label>Téléphone<input id="supplierPhone"></label><label>Adresse<input id="supplierAddress"></label></div><div class="actions"><button id="addSupplierBtn">Ajouter fournisseur</button></div></form>
+<p id="supplierStatus" class="status small"></p><div class="tablewrap"><table><thead><tr><th>Nom</th><th>Téléphone</th><th>Adresse</th></tr></thead><tbody id="supplierRows"></tbody></table></div>
+</section>
+<section id="lots" class="panel card">
+<h2>Achats et réception de stock</h2>
+<p class="small">La création d'un lot enregistre automatiquement l'entrée initiale, la quantité et le prix d'achat.</p>
+<form id="lotForm"><div class="formgrid">
+<label>Médicament *<select id="lotMedicine" required></select></label><label>Fournisseur<select id="lotSupplier"><option value="">Sans fournisseur</option></select></label><label>Numéro de lot *<input id="lotNumber" required></label><label>Date de péremption *<input id="lotExpiry" type="date" required></label><label>Quantité reçue (boîtes) *<input id="lotQty" type="number" min="1" step="1" required></label><label>Prix d'achat unitaire *<input id="lotPrice" type="number" min="0" step="0.01" required></label>
+</div><div class="actions"><button id="addLotBtn">Enregistrer la réception</button></div></form>
+<p id="lotStatus" class="status small"></p><h3>Lots et dates de péremption</h3><div class="tablewrap"><table><thead><tr><th>Médicament</th><th>Lot</th><th>Expiration</th><th>Quantité restante</th><th>Prix achat</th><th>État</th></tr></thead><tbody id="lotRows"></tbody></table></div>
+</section>
+<section id="stock" class="panel card">
+<h2>Mouvements de stock</h2>
+<form id="movementForm"><div class="formgrid">
+<label>Lot concerné *<select id="movementLot" required></select></label>
+<label>Type de mouvement *<select id="movementType"><option value="sale">Vente / sortie</option><option value="return">Retour reçu</option><option value="exchange_received">Échange reçu</option><option value="exchange_given">Échange cédé</option><option value="loss">Perte</option><option value="expired">Périmé</option></select></label>
+<label>Quantité (boîtes) *<input id="movementQty" type="number" min="1" step="1" required></label><label>Note<input id="movementNotes" placeholder="Référence ou remarque"></label>
+</div><div class="actions"><button id="saveMovementBtn">Enregistrer le mouvement</button></div></form>
+<p class="small">Les sorties sont déduites du lot sélectionné. Les retours et échanges reçus sont ajoutés à ce lot.</p><p id="movementStatus" class="status small"></p>
+<h3>Historique récent</h3><div class="tablewrap"><table><thead><tr><th>Date</th><th>Médicament</th><th>Lot</th><th>Type</th><th>Variation</th><th>Note</th></tr></thead><tbody id="movementRows"></tbody></table></div>
+</section>
+<section id="reports" class="panel card">
+<h2>Rapports et alertes</h2><p class="small">Les alertes sont calculées à partir des dates de péremption des lots encore en stock.</p><div id="expiryReport"></div><h3>Historique des prix d'achat</h3><div class="tablewrap"><table><thead><tr><th>Date</th><th>Médicament</th><th>Lot</th><th>Prix d'achat</th></tr></thead><tbody id="priceRows"></tbody></table></div>
+</section>
+</div>
+</main><footer>PharmaGest — Gestion de pharmacie</footer>
 <script>
-
-// =====================================
-// 1. SUPABASE CONFIGURATION
-// =====================================
-
-const SUPABASE_URL =
-  'https://ktymtpqkykidsivsxipb.supabase.co';
-
-const SUPABASE_KEY =
-  'sb_publishable_LVPYXeyt_jr9EhwyF5c9uw_AqLnLBXu';
-
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-window.pharmaDB = db;
-
-
-// =====================================
-// 2. ELEMENTS
-// =====================================
-
-const loginSection =
-  document.getElementById('loginSection');
-
-const loginForm =
-  document.getElementById('loginForm');
-
-const loginButton =
-  document.getElementById('loginButton');
-
-const logout =
-  document.getElementById('logout');
-
-const status =
-  document.getElementById('status');
-
-const pharmacyName =
-  document.getElementById('pharmacyName');
-
-const medicineSection =
-  document.getElementById('medicineSection');
-
-const medicineForm =
-  document.getElementById('medicineForm');
-
-const medicineStatus =
-  document.getElementById('medicineStatus');
-
-const medicineList =
-  document.getElementById('medicineList');
-
-const addMedicineButton =
-  document.getElementById('addMedicineButton');
-
-
-// =====================================
-// 3. CURRENT PHARMACY
-// =====================================
-
-let currentPharmacyId = null;
-
-
-// =====================================
-// 4. LOAD MEDICINES
-// =====================================
-
-async function loadMedicines() {
-
-  if (!currentPharmacyId) {
-    return;
-  }
-
-  medicineStatus.textContent = 'Chargement...';
-
-  const { data, error } = await db
-    .from('medicaments')
-    .select(
-      'id,name,dci,dosage,pharmaceutical_form,laboratory'
-    )
-    .eq('pharmacy_id', currentPharmacyId)
-    .order('name');
-
-  if (error) {
-    medicineStatus.textContent =
-      'Erreur : ' + error.message;
-    return;
-  }
-
-  medicineList.replaceChildren();
-
-  if (!data || data.length === 0) {
-    medicineStatus.textContent =
-      'Aucun médicament enregistré.';
-    return;
-  }
-
-  data.forEach(m => {
-
-    const item = document.createElement('div');
-    item.className = 'medicine-item';
-
-    const name = document.createElement('strong');
-    name.textContent = m.name || '';
-
-    const details = document.createElement('p');
-
-    details.textContent = [
-      m.dci,
-      m.dosage,
-      m.pharmaceutical_form,
-      m.laboratory
-    ].filter(Boolean).join(' — ');
-
-    item.appendChild(name);
-    item.appendChild(details);
-
-    medicineList.appendChild(item);
-
-  });
-
-  medicineStatus.textContent =
-    data.length + ' médicament(s) enregistré(s).';
+(() => {
+'use strict';
+const SUPABASE_URL='https://ktymtpqkykidsivsxipb.supabase.co';
+const SUPABASE_KEY='sb_publishable_LVPYXeyt_jr9EhwyF5c9uw_AqLnLBXu';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+let pharmacyId=null, currentUser=null, currentRole='', medicines=[], suppliers=[], lots=[], movements=[], prices=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const msg=(id,text,kind='')=>{const e=$(id);e.textContent=text;e.className='status small '+kind;};
+const dateFmt=s=>s?new Date(s+'T00:00:00').toLocaleDateString('fr-FR'):'—';
+const dateTime=s=>s?new Date(s).toLocaleString('fr-FR'):'—';
+const today=()=>new Date().toISOString().slice(0,10);
+function expiryInfo(date){const days=Math.ceil((new Date(date+'T00:00:00')-new Date(today()+'T00:00:00'))/86400000);if(days<0)return {label:'Expiré',cls:'red',days};if(days<=30)return {label:'≤ 1 mois',cls:'red',days};if(days<=60)return {label:'≤ 2 mois',cls:'orange',days};if(days<=90)return {label:'≤ 3 mois',cls:'orange',days};return {label:'Valide',cls:'',days};}
+function setBusy(id,busy,label){const b=$(id);b.disabled=busy;if(label){if(!b.dataset.original)b.dataset.original=b.textContent;b.textContent=busy?label:b.dataset.original;}}
+function switchTab(id){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));}
+document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+async function getPharmacy(userId){
+ const {data:member,error:me}=await db.from('pharmacy_members').select('pharmacy_id,role').eq('user_id',userId).limit(1).maybeSingle();
+ if(me)throw me;if(!member)throw new Error('Aucune pharmacie associée à cet utilisateur.');
+ const {data:ph,error}=await db.from('pharmacies').select('id,name').eq('id',member.pharmacy_id).single();
+ if(error)throw error;currentRole=member.role;return ph;
 }
-
-
-// =====================================
-// 5. LOAD PHARMACY MEMBERSHIP
-// =====================================
-
-async function getPharmacy(userId) {
-
-  const { data: member, error: memberError } = await db
-    .from('pharmacy_members')
-    .select('pharmacy_id')
-    .eq('user_id', userId)
-    .limit(1)
-    .maybeSingle();
-
-  if (memberError || !member) {
-    throw new Error(
-      'Aucune pharmacie associée à cet utilisateur.'
-    );
-  }
-
-  const { data: pharmacy, error: pharmacyError } = await db
-    .from('pharmacies')
-    .select('id,name')
-    .eq('id', member.pharmacy_id)
-    .single();
-
-  if (pharmacyError || !pharmacy) {
-    throw new Error(
-      'Impossible de charger la pharmacie.'
-    );
-  }
-
-  return pharmacy;
+function permissions(){
+ const manager=['admin','manager'].includes(currentRole);
+ ['medicineForm','supplierForm','lotForm'].forEach(id=>$(id).classList.toggle('hidden',!manager));
+ $('roleLabel').textContent=currentRole==='admin'?'Administrateur':currentRole==='manager'?'Gestionnaire':'Vendeur';
 }
-
-
-// =====================================
-// 6. SHOW CONNECTED INTERFACE
-// =====================================
-
-async function showAuthenticatedUI(user) {
-
-  try {
-
-    loginSection.style.display = 'none';
-
-    status.textContent = 'Chargement de votre pharmacie...';
-
-    logout.hidden = false;
-
-    const pharmacy = await getPharmacy(user.id);
-
-    currentPharmacyId = pharmacy.id;
-
-    pharmacyName.textContent =
-      'Pharmacie : ' + pharmacy.name;
-
-    medicineSection.style.display = 'block';
-
-    await loadMedicines();
-
-    status.textContent =
-      'Connexion réussie.';
-
-  } catch (error) {
-
-    currentPharmacyId = null;
-
-    medicineSection.style.display = 'none';
-
-    status.textContent =
-      'Erreur : ' + error.message;
-
-  }
+async function fetchAll(){
+ const [m,s,l,v,p]=await Promise.all([
+ db.from('medicaments').select('id,name,dci,dosage,pharmaceutical_form,laboratory,is_active').eq('pharmacy_id',pharmacyId).order('name'),
+ db.from('suppliers').select('id,name,phone,address').eq('pharmacy_id',pharmacyId).order('name'),
+ db.from('lots').select('id,medicament_id,supplier_id,lot_number,expiry_date,quantity_received,quantity_remaining,purchase_price,created_at').eq('pharmacy_id',pharmacyId).order('expiry_date'),
+ db.from('stock_movements').select('id,medicament_id,lot_id,movement_type,quantity_change,notes,created_at').eq('pharmacy_id',pharmacyId).order('created_at',{ascending:false}).limit(100),
+ db.from('price_history').select('id,medicament_id,lot_id,price,effective_at,price_type').eq('pharmacy_id',pharmacyId).eq('price_type','purchase').order('effective_at',{ascending:false}).limit(100)
+ ]);
+ for(const x of [m,s,l,v,p])if(x.error)throw x.error;
+ medicines=m.data||[];suppliers=s.data||[];lots=l.data||[];movements=v.data||[];prices=p.data||[];
+ renderAll();
 }
-
-
-// =====================================
-// 7. LOGIN
-// =====================================
-
-loginForm.addEventListener('submit', async (event) => {
-
-  event.preventDefault();
-
-  loginButton.disabled = true;
-
-  status.textContent = 'Connexion en cours...';
-
-  const email =
-    document.getElementById('email').value.trim();
-
-  const password =
-    document.getElementById('password').value;
-
-  try {
-
-    const { data, error } = await db.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) {
-      throw error;
-    }
-
-    await showAuthenticatedUI(data.user);
-
-  } catch (error) {
-
-    status.textContent =
-      'Erreur : ' + error.message;
-
-  } finally {
-
-    loginButton.disabled = false;
-
-  }
-
-});
-
-
-// =====================================
-// 8. LOGOUT
-// =====================================
-
-logout.addEventListener('click', async () => {
-
-  logout.disabled = true;
-
-  const { error } = await db.auth.signOut();
-
-  logout.disabled = false;
-
-  if (error) {
-    status.textContent =
-      'Erreur : ' + error.message;
-    return;
-  }
-
-  currentPharmacyId = null;
-
-  loginSection.style.display = 'block';
-
-  medicineSection.style.display = 'none';
-
-  logout.hidden = true;
-
-  pharmacyName.textContent =
-    'Veuillez vous connecter.';
-
-  medicineList.replaceChildren();
-
-  medicineStatus.textContent = '';
-
-  loginForm.reset();
-
-  status.textContent =
-    'Vous êtes déconnecté.';
-
-});
-
-
-// =====================================
-// 9. ADD MEDICINE
-// =====================================
-
-medicineForm.addEventListener('submit', async (event) => {
-
-  event.preventDefault();
-
-  if (!currentPharmacyId) {
-    medicineStatus.textContent =
-      'Veuillez vous connecter.';
-    return;
-  }
-
-  addMedicineButton.disabled = true;
-
-  medicineStatus.textContent =
-    'Enregistrement en cours...';
-
-  try {
-
-    const { data: userData, error: userError } =
-      await db.auth.getUser();
-
-    if (userError || !userData.user) {
-      throw new Error('Session expirée. Reconnectez-vous.');
-    }
-
-    const { error } = await db
-      .from('medicaments')
-      .insert({
-
-        pharmacy_id: currentPharmacyId,
-
-        name: document.getElementById('medName').value.trim(),
-
-        dci: document.getElementById('medDCI').value.trim(),
-
-        dosage: document.getElementById('medDosage').value.trim(),
-
-        pharmaceutical_form:
-          document.getElementById('medForm').value.trim(),
-
-        laboratory:
-          document.getElementById('medLab').value.trim()
-
-      });
-
-    if (error) {
-      throw error;
-    }
-
-    medicineForm.reset();
-
-    medicineStatus.textContent =
-      'Médicament ajouté avec succès.';
-
-    await loadMedicines();
-
-  } catch (error) {
-
-    medicineStatus.textContent =
-      'Erreur : ' + error.message;
-
-  } finally {
-
-    addMedicineButton.disabled = false;
-
-  }
-
-});
-
-
-// =====================================
-// 10. RESTORE SESSION
-// =====================================
-
-async function initializeApp() {
-
-  status.textContent = 'Vérification de la session...';
-
-  const { data, error } = await db.auth.getSession();
-
-  if (error) {
-
-    status.textContent =
-      'Erreur : ' + error.message;
-
-    return;
-  }
-
-  if (data.session) {
-
-    await showAuthenticatedUI(data.session.user);
-
-  } else {
-
-    loginSection.style.display = 'block';
-
-    medicineSection.style.display = 'none';
-
-    logout.hidden = true;
-
-    status.textContent =
-      'Veuillez vous connecter.';
-
-  }
-
+function renderAll(){
+ const medMap=new Map(medicines.map(x=>[x.id,x])),lotMap=new Map(lots.map(x=>[x.id,x]));
+ $('statMeds').textContent=medicines.length;
+ $('statLots').textContent=lots.filter(x=>x.quantity_remaining>0).length;
+ $('statQty').textContent=lots.reduce((a,x)=>a+Number(x.quantity_remaining||0),0);
+ $('statExpiry').textContent=lots.filter(x=>x.quantity_remaining>0&&expiryInfo(x.expiry_date).days<=90).length;
+ const q=$('medSearch').value.trim().toLowerCase();
+ $('medRows').innerHTML=medicines.filter(m=>[m.name,m.dci,m.dosage,m.laboratory].join(' ').toLowerCase().includes(q)).map(m=>{
+ const qty=lots.filter(l=>l.medicament_id===m.id).reduce((a,l)=>a+Number(l.quantity_remaining||0),0);
+ return `<tr><td><b>${esc(m.name)}</b></td><td>${esc(m.dci||'—')}</td><td>${esc(m.dosage||'—')}</td><td>${esc(m.pharmaceutical_form||'—')}</td><td>${esc(m.laboratory||'—')}</td><td>${qty}</td></tr>`;
+ }).join('')||'<tr><td colspan="6">Aucun médicament.</td></tr>';
+ $('supplierRows').innerHTML=suppliers.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.phone||'—')}</td><td>${esc(s.address||'—')}</td></tr>`).join('')||'<tr><td colspan="3">Aucun fournisseur.</td></tr>';
+ $('lotMedicine').innerHTML='<option value="">Choisir un médicament</option>'+medicines.filter(m=>m.is_active!==false).map(m=>`<option value="${m.id}">${esc(m.name)}${m.dosage?' — '+esc(m.dosage):''}</option>`).join('');
+ $('lotSupplier').innerHTML='<option value="">Sans fournisseur</option>'+suppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+ $('lotRows').innerHTML=lots.map(l=>{const m=medMap.get(l.medicament_id),st=expiryInfo(l.expiry_date),cls=l.quantity_remaining<=0?'red':st.cls;return `<tr><td>${esc(m?.name||'Médicament')}</td><td>${esc(l.lot_number)}</td><td>${dateFmt(l.expiry_date)}</td><td>${l.quantity_remaining} / ${l.quantity_received}</td><td>${Number(l.purchase_price).toFixed(2)}</td><td><span class="pill ${cls}">${l.quantity_remaining<=0?'Épuisé':st.label}</span></td></tr>`}).join('')||'<tr><td colspan="6">Aucun lot enregistré.</td></tr>';
+ const available=lots.filter(l=>l.quantity_remaining>0);
+ $('movementLot').innerHTML='<option value="">Choisir un lot</option>'+available.map(l=>`<option value="${l.id}">${esc(medMap.get(l.medicament_id)?.name||'Médicament')} — ${esc(l.lot_number)} (reste ${l.quantity_remaining})</option>`).join('');
+ const names={purchase:'Achat',sale:'Vente / sortie',return:'Retour reçu',adjustment:'Ajustement',expired:'Périmé',exchange_received:'Échange reçu',exchange_given:'Échange cédé',loss:'Perte'};
+ $('movementRows').innerHTML=movements.map(v=>{const l=lotMap.get(v.lot_id);return `<tr><td>${dateTime(v.created_at)}</td><td>${esc(medMap.get(v.medicament_id)?.name||'—')}</td><td>${esc(l?.lot_number||'—')}</td><td>${esc(names[v.movement_type]||v.movement_type)}</td><td>${v.quantity_change>0?'+':''}${v.quantity_change}</td><td>${esc(v.notes||'—')}</td></tr>`}).join('')||'<tr><td colspan="6">Aucun mouvement.</td></tr>';
+ $('expiryReport').innerHTML=lots.filter(l=>l.quantity_remaining>0&&expiryInfo(l.expiry_date).days<=90).sort((a,b)=>a.expiry_date.localeCompare(b.expiry_date)).map(l=>{const st=expiryInfo(l.expiry_date);return `<p><span class="pill ${st.cls}">${st.label}</span> <b>${esc(medMap.get(l.medicament_id)?.name||'—')}</b> — Lot ${esc(l.lot_number)} — ${dateFmt(l.expiry_date)} — ${l.quantity_remaining} boîte(s)</p>`}).join('')||'<p class="ok">Aucune alerte de péremption dans les 3 prochains mois.</p>';
+ $('priceRows').innerHTML=prices.map(p=>`<tr><td>${dateTime(p.effective_at)}</td><td>${esc(medMap.get(p.medicament_id)?.name||'—')}</td><td>${esc(lotMap.get(p.lot_id)?.lot_number||'—')}</td><td>${Number(p.price).toFixed(2)}</td></tr>`).join('')||'<tr><td colspan="4">Aucun historique de prix.</td></tr>';
 }
-
-
-// =====================================
-// 11. START APPLICATION
-// =====================================
-
-initializeApp();
-
+async function refresh(){try{await fetchAll();$('dashStatus').textContent='Données actualisées.';}catch(e){$('dashStatus').textContent='Erreur de chargement : '+e.message;}}
+async function showApp(user){
+ currentUser=user;$('loginCard').classList.add('hidden');$('app').classList.remove('hidden');$('logoutBtn').classList.remove('hidden');$('dashStatus').textContent='Chargement...';
+ try{const ph=await getPharmacy(user.id);pharmacyId=ph.id;$('pharmacyLabel').textContent='Pharmacie : '+ph.name;permissions();await refresh();}
+ catch(e){pharmacyId=null;$('app').classList.add('hidden');$('loginCard').classList.remove('hidden');$('logoutBtn').classList.add('hidden');msg('loginStatus','Connexion établie, mais chargement de la pharmacie impossible : '+e.message,'err');}
+}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();setBusy('loginBtn',true,'Connexion...');msg('loginStatus','Vérification...');try{const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;await showApp(data.user);}catch(err){msg('loginStatus','Erreur : '+err.message,'err');}finally{setBusy('loginBtn',false);}});
+$('logoutBtn').addEventListener('click',async()=>{setBusy('logoutBtn',true,'Déconnexion...');const {error}=await db.auth.signOut();setBusy('logoutBtn',false);if(error){$('dashStatus').textContent=error.message;return;}pharmacyId=null;currentUser=null;$('app').classList.add('hidden');$('loginCard').classList.remove('hidden');$('logoutBtn').classList.add('hidden');$('loginForm').reset();msg('loginStatus','Vous êtes déconnecté.');});
+$('medSearch').addEventListener('input',renderAll);
+$('medicineForm').addEventListener('submit',async e=>{e.preventDefault();if(!pharmacyId)return;setBusy('addMedBtn',true,'Enregistrement...');try{const {error}=await db.from('medicaments').insert({pharmacy_id:pharmacyId,name:$('medName').value.trim(),dci:$('medDCI').value.trim()||null,dosage:$('medDosage').value.trim()||null,pharmaceutical_form:$('medForm').value.trim()||null,laboratory:$('medLab').value.trim()||null});if(error)throw error;$('medicineForm').reset();msg('medStatus','Médicament ajouté.','ok');await refresh();}catch(e){msg('medStatus','Erreur : '+e.message,'err');}finally{setBusy('addMedBtn',false);}});
+$('supplierForm').addEventListener('submit',async e=>{e.preventDefault();setBusy('addSupplierBtn',true,'Enregistrement...');try{const {error}=await db.from('suppliers').insert({pharmacy_id:pharmacyId,name:$('supplierName').value.trim(),phone:$('supplierPhone').value.trim()||null,address:$('supplierAddress').value.trim()||null});if(error)throw error;$('supplierForm').reset();msg('supplierStatus','Fournisseur ajouté.','ok');await refresh();}catch(e){msg('supplierStatus','Erreur : '+e.message,'err');}finally{setBusy('addSupplierBtn',false);}});
+$('lotForm').addEventListener('submit',async e=>{e.preventDefault();setBusy('addLotBtn',true,'Enregistrement...');try{const args={p_pharmacy_id:pharmacyId,p_medicament_id:$('lotMedicine').value,p_lot_number:$('lotNumber').value.trim(),p_expiry_date:$('lotExpiry').value,p_quantity:Number($('lotQty').value),p_purchase_price:Number($('lotPrice').value),p_supplier_id:$('lotSupplier').value||null};const {data,error}=await db.rpc('create_stock_lot',args);if(error)throw error;if(data?.success===false)throw new Error(data.message||'Échec de création du lot');$('lotForm').reset();msg('lotStatus',data?.message||'Lot enregistré avec succès.','ok');await refresh();}catch(e){msg('lotStatus','Erreur : '+e.message,'err');}finally{setBusy('addLotBtn',false);}});
+$('movementForm').addEventListener('submit',async e=>{e.preventDefault();setBusy('saveMovementBtn',true,'Enregistrement...');try{const {data,error}=await db.rpc('register_stock_movement',{p_pharmacy_id:pharmacyId,p_lot_id:$('movementLot').value,p_movement_type:$('movementType').value,p_quantity:Number($('movementQty').value),p_notes:$('movementNotes').value.trim()||null});if(error)throw error;if(data?.success===false)throw new Error(data.message||'Échec du mouvement');$('movementForm').reset();msg('movementStatus',data?.message||'Mouvement enregistré.','ok');await refresh();}catch(e){msg('movementStatus','Erreur : '+e.message,'err');}finally{setBusy('saveMovementBtn',false);}});
+async function init(){const {data,error}=await db.auth.getSession();if(error){msg('loginStatus','Erreur : '+error.message,'err');return;}if(data.session)await showApp(data.session.user);}
+init();
+})();
 </script>
-
-</body>
-</html>
-
+</body></html>
